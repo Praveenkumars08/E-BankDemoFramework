@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="EBank Regression Suite" thread-count="2" parallel = "tests">
+
+	<test name="Login Page Test">
+		<classes>
+			<class name="com.ebank.tests.LoginPageTest" />
+		</classes>
+	</test>
+
+	<test name="Manager Home Page Test">
+		<classes>
+			<class name="com.ebank.tests.ManagerHomePageTest" />
+		</classes>
+	</test>
+
+</suite>
