@@ -3,12 +3,16 @@ package com.ebank.factory;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
+
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 
@@ -25,20 +29,38 @@ public class DriverFactory {
 		String browserName = prop.getProperty("browser");
 		optionsManager = new OptionsManager(prop);
 		if(browserName.equalsIgnoreCase("chrome")) {
+			
+			if(Boolean.parseBoolean(prop.getProperty("remote"))) {
+				initRemoteDriver("chrome");
+			}
+			else {
 			WebDriverManager.chromedriver().setup();
 			//driver= new ChromeDriver();
 			threadLocalDriver.set(new ChromeDriver(optionsManager.getChromeOptions()));
+			}
 		}
 		else if(browserName.equalsIgnoreCase("firefox")) {
+			
+			if(Boolean.parseBoolean(prop.getProperty("remote"))) {
+				initRemoteDriver("firefox");
+			}
+			else {
 			WebDriverManager.firefoxdriver().setup();
 			//driver = new FirefoxDriver();
 			threadLocalDriver.set(new FirefoxDriver());
+			}
 			
 		}
 		else if(browserName.equalsIgnoreCase("edge")) {
+			
+			if(Boolean.parseBoolean(prop.getProperty("remote"))) {
+				initRemoteDriver("edge");
+			}
+			else {
 			WebDriverManager.edgedriver().setup();
 			//driver = new EdgeDriver();
 			threadLocalDriver.set(new EdgeDriver());
+			}
 		}
 		else {
 			System.out.println("Please pass the right browser"+browserName);
@@ -52,6 +74,38 @@ public class DriverFactory {
 	
 	public static synchronized WebDriver getDriver() {
 		return threadLocalDriver.get();
+	}
+	
+	private void initRemoteDriver(String browser) {
+		
+		if(browser.equals("chrome")) {
+			try {
+				threadLocalDriver.set(new RemoteWebDriver(new URL(prop.getProperty("huburl")), optionsManager.getChromeOptions()));
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		else if(browser.equals("firefox")) {
+			try {
+				threadLocalDriver.set(new RemoteWebDriver(new URL(prop.getProperty("huburl")), optionsManager.getFireFoxOptions()));
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		else if(browser.equals("edge")) {
+			try {
+				threadLocalDriver.set(new RemoteWebDriver(new URL(prop.getProperty("huburl")), optionsManager.getEdgeOptions()));
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+		}
+		else {
+			System.out.println("Please pass the right browser");
+		}
+		
+		
 	}
 	
 	public Properties initializeProp() {
